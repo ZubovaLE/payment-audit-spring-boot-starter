@@ -1,11 +1,13 @@
 package com.zubova.paymentaudit.autoconfigure;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.zubova.paymentaudit.aop.PaymentAuditAspect;
 import com.zubova.paymentaudit.config.PaymentAuditProperties;
 import com.zubova.paymentaudit.event.PaymentEvent;
 import com.zubova.paymentaudit.event.publisher.KafkaPaymentEventPublisher;
 import com.zubova.paymentaudit.event.publisher.PaymentEventPublisher;
 import com.zubova.paymentaudit.payload.AuditPayloadProcessor;
+import io.micrometer.core.instrument.MeterRegistry;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -33,6 +35,14 @@ public class PaymentAuditAutoConfiguration {
     @ConditionalOnBean(ObjectMapper.class)
     AuditPayloadProcessor auditPayloadProcessor(ObjectMapper objectMapper, PaymentAuditProperties properties) {
         return new AuditPayloadProcessor(objectMapper, properties);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnBean({PaymentEventPublisher.class, AuditPayloadProcessor.class, MeterRegistry.class})
+    PaymentAuditAspect paymentAuditAspect(PaymentAuditProperties properties, PaymentEventPublisher publisher,
+                                          AuditPayloadProcessor auditPayloadProcessor, MeterRegistry meterRegistry) {
+        return new PaymentAuditAspect(properties, publisher, auditPayloadProcessor, meterRegistry);
     }
 
 }

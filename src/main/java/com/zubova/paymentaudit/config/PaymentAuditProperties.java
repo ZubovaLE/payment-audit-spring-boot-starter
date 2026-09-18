@@ -20,6 +20,8 @@ public class PaymentAuditProperties {
 
     private EventPublisherType eventPublisherType = EventPublisherType.KAFKA;
 
+    private AuditFailureStrategy failureStrategy = AuditFailureStrategy.FAIL_OPEN;
+
     public List<String> getSensitiveFields() {
         return sensitiveFields;
     }
@@ -74,6 +76,14 @@ public class PaymentAuditProperties {
 
     public void setEventPublisherType(EventPublisherType eventPublisherType) {
         this.eventPublisherType = eventPublisherType;
+    }
+
+    public AuditFailureStrategy getFailureStrategy() {
+        return failureStrategy;
+    }
+
+    public void setFailureStrategy(AuditFailureStrategy failureStrategy) {
+        this.failureStrategy = failureStrategy;
     }
 
     public enum EventPublisherType {
